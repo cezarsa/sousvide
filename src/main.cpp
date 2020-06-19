@@ -1,13 +1,13 @@
 #include <Arduino.h>
 
-// #include "base.hpp"
+#include "base.h"
 
-// base app;
+base app;
 
 void setup() {
-  //   if (!app.connect()) {
-  //     return;
-  //   }
+  if (!app.connect()) {
+    return;
+  }
 }
 
 void loop() {}
