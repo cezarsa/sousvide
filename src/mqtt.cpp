@@ -5,9 +5,10 @@ void baseOnMessage(char* topic, uint8_t* payload, unsigned int length) {}
 mqtt::mqtt(String server, String topic) : pubsub(wifi) {
   this->topic = topic;
   pubsub.setServer(server.c_str(), 1883);
-  pubsub.setCallback([=](char* topic, uint8_t* payload, unsigned int length) {
-    this->onMessage(topic, payload, length);
-  });
+  pubsub.setCallback(
+      [this](char* topic, uint8_t* payload, unsigned int length) {
+        this->onMessage(topic, payload, length);
+      });
 }
 
 mqtt::~mqtt() {}
