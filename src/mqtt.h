@@ -4,6 +4,8 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
+#define MQTT_DEFAULT_PORT 1883
+
 class mqtt {
  private:
   WiFiClient wifi;

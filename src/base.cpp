@@ -9,6 +9,12 @@ base::base()
                 "home/kitchen/sousvide",
                 MAX_PARAM_LENGTH - 1),
       mqttServer("server", "mqtt server", "pi.casa", MAX_PARAM_LENGTH - 1) {
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(1000);
+  Serial.begin(9600);
+  Serial.println("Initializing...");
+
   wifiManager.setConfigPortalTimeout(180);
   wifiManager.setSaveConfigCallback(std::bind(&base::saveConfig, this));
   wifiManager.addParameter(&mqttServer);
@@ -16,7 +22,6 @@ base::base()
 }
 
 bool base::connect() {
-  digitalWrite(LED_BUILTIN, LOW);
   loadConfig();
   String ssid = String("esp-") + ESP.getChipId();
   if (!wifiManager.autoConnect(ssid.c_str())) {
