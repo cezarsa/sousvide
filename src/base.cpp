@@ -4,19 +4,20 @@
 #include <LittleFS.h>
 
 base::base()
-    : mqtt(wifi),
-      custom_mqtt_topic("topic",
-                        "mqtt topic",
-                        "home/kitchen/sousvide",
-                        MAX_TOPIC_LENGTH - 1) {
+    : mqttTopic("topic",
+                "mqtt topic",
+                "home/kitchen/sousvide",
+                MAX_PARAM_LENGTH - 1),
+      mqttServer("server", "mqtt server", "pi.casa", MAX_PARAM_LENGTH - 1) {
   wifiManager.setConfigPortalTimeout(180);
-  wifiManager.setSaveConfigCallback(std::bind(&base::saveTopic, this));
-  wifiManager.addParameter(&custom_mqtt_topic);
+  wifiManager.setSaveConfigCallback(std::bind(&base::saveConfig, this));
+  wifiManager.addParameter(&mqttServer);
+  wifiManager.addParameter(&mqttTopic);
 }
 
 bool base::connect() {
   digitalWrite(LED_BUILTIN, LOW);
-  loadTopic();
+  loadConfig();
   String ssid = String("esp-") + ESP.getChipId();
   if (!wifiManager.autoConnect(ssid.c_str())) {
     Serial.println("failed to connect and hit timeout");
@@ -24,39 +25,57 @@ bool base::connect() {
     ESP.restart();
     return false;
   }
-  saveTopic();
+  saveConfig();
   digitalWrite(LED_BUILTIN, HIGH);
   Serial.print("Connected with IP: ");
   Serial.println(WiFi.localIP());
   return true;
 }
 
-void base::saveTopic() {
+void base::saveConfig() {
   if (!LittleFS.begin()) {
     return;
   }
 
-  String mqtt_topic = custom_mqtt_topic.getValue();
-  File configFile = LittleFS.open("mqtt_topic.txt", "w");
-  if (!configFile) {
-    return;
+  auto params = wifiManager.getParameters();
+  auto paramsCount = wifiManager.getParametersCount();
+  for (int i = 0; i < paramsCount; i++) {
+    auto param = params[i];
+
+    File configFile = LittleFS.open(param->getID(), "w");
+    if (!configFile) {
+      return;
+    }
+    configFile.write((uint8_t*)param->getValue(), param->getValueLength());
+    configFile.close();
   }
-  configFile.write((uint8_t*)mqtt_topic.c_str(), mqtt_topic.length());
-  configFile.close();
 }
 
-void base::loadTopic() {
+void base::loadConfig() {
   if (!LittleFS.begin()) {
     return;
   }
 
-  File configFile = LittleFS.open("mqtt_topic.txt", "r");
-  if (!configFile) {
-    return;
+  auto params = wifiManager.getParameters();
+  auto paramsCount = wifiManager.getParametersCount();
+  for (int i = 0; i < paramsCount; i++) {
+    auto param = params[i];
+
+    File configFile = LittleFS.open(param->getID(), "r");
+    if (!configFile) {
+      return;
+    }
+    param->setValue(configFile.readString().c_str(), MAX_PARAM_LENGTH - 1);
+    configFile.close();
   }
-  custom_mqtt_topic.setValue(configFile.readString().c_str(),
-                             MAX_TOPIC_LENGTH - 1);
-  configFile.close();
+}
+
+String base::topic() {
+  return mqttTopic.getValue();
+}
+
+String base::server() {
+  return mqttServer.getValue();
 }
 
 base::~base() {}
