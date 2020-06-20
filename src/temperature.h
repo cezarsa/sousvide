@@ -13,7 +13,7 @@ class temp {
   DallasTemperature sensors;
   bool initialized = false;
   unsigned long lastLoop = 0;
-  mqtt* conn;
+  mqtt* conn = nullptr;
 
  public:
   temp(String name, int pin);

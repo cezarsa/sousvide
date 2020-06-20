@@ -8,7 +8,7 @@ class relay {
   bool state = false;
   String name;
   int pin;
-  mqtt* conn;
+  mqtt* conn = nullptr;
   unsigned long lastRefreshCheck = 0;
 
   void refresh();

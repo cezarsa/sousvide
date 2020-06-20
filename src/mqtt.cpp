@@ -22,6 +22,9 @@ mqtt::~mqtt() {}
 
 void mqtt::onMessage(char* topic, uint8_t* payload, unsigned int length) {
   String topicStr(topic);
+  if (!topicStr.endsWith("/set")) {
+    return;
+  }
 
   char message[length + 1];
   memcpy(message, payload, length);
@@ -63,7 +66,7 @@ void mqtt::connect() {
 
   if (pubsub.connect(clientId.c_str())) {
     String subscribeTopic = baseTopic;
-    subscribeTopic += "/+/set";
+    subscribeTopic += "/#";
     Serial.printf("[mqtt] connected, subscribing %s\n", subscribeTopic.c_str());
     pubsub.subscribe(subscribeTopic.c_str());
   } else {
