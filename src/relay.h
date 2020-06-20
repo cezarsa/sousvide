@@ -9,6 +9,7 @@ class relay {
   String name;
   int pin;
   mqtt* conn;
+  unsigned long lastRefreshCheck = 0;
 
   void refresh();
 
@@ -21,6 +22,7 @@ class relay {
   void toggle();
 
   void bindMQTT(mqtt* conn, bool pubOnly);
+  void loop();
 };
 
 #endif

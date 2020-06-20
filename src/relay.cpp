@@ -26,10 +26,19 @@ void relay::toggle() {
 
 void relay::refresh() {
   Serial.printf("[relay] updating %s - state %d\n", name.c_str(), state);
-  digitalWrite(pin, state ? HIGH : LOW);
+  digitalWrite(pin, state ? LOW : HIGH);
   if (conn) {
-    conn->publish(name, String(state));
+    conn->publish(name + "/state", String(state));
   }
+}
+
+void relay::loop() {
+  unsigned long now = millis();
+  if (now - lastRefreshCheck < 5000) {
+    return;
+  }
+  lastRefreshCheck = now;
+  refresh();
 }
 
 void relay::bindMQTT(mqtt* conn, bool pubOnly) {
