@@ -8,11 +8,13 @@ temp::~temp() {}
 float temp::readTemperature() {
   if (!initialized) {
     sensors.begin();
-    initialized = true;
   }
 
   sensors.requestTemperatures();
   float tempC = sensors.getTempCByIndex(0);
+  if (tempC != DEVICE_DISCONNECTED_C) {
+    initialized = true;
+  }
   return tempC;
 }
 
