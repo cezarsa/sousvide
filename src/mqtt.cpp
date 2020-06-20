@@ -1,10 +1,7 @@
 #include "mqtt.h"
 
-void baseOnMessage(char* topic, uint8_t* payload, unsigned int length) {}
-
-mqtt::mqtt(String server, String topic) : pubsub(wifi) {
-  this->topic = topic;
-  Serial.printf("MQTT initialize, server: %s, topic: %s\n", server.c_str(),
+mqtt::mqtt(String server, String topic) : pubsub(wifi), baseTopic(topic) {
+  Serial.printf("[mqtt] Initialize, server: %s, topic: %s\n", server.c_str(),
                 topic.c_str());
 
   IPAddress serverIP;
@@ -12,7 +9,8 @@ mqtt::mqtt(String server, String topic) : pubsub(wifi) {
   if (isIP) {
     pubsub.setServer(serverIP, MQTT_DEFAULT_PORT);
   } else {
-    pubsub.setServer(server.c_str(), MQTT_DEFAULT_PORT);
+    String* serverCopy = new String(server);
+    pubsub.setServer(serverCopy->c_str(), MQTT_DEFAULT_PORT);
   }
   pubsub.setCallback(
       [this](char* topic, uint8_t* payload, unsigned int length) {
@@ -22,7 +20,28 @@ mqtt::mqtt(String server, String topic) : pubsub(wifi) {
 
 mqtt::~mqtt() {}
 
-void mqtt::onMessage(char* topic, uint8_t* payload, unsigned int length) {}
+void mqtt::onMessage(char* topic, uint8_t* payload, unsigned int length) {
+  String topicStr(topic);
+
+  char message[length + 1];
+  memcpy(message, payload, length);
+  message[length] = 0;
+
+  Serial.printf("[mqtt] message received in \"%s\": \"%s\"\n", topic, message);
+
+  if (topicStr.indexOf(baseTopic) != 0) {
+    return;
+  }
+
+  auto name = topicStr.substring(baseTopic.length());
+  Serial.printf("[mqtt] parsed name \"%s\"\n", name.c_str());
+
+  if (topicMap.find(name.c_str()) == topicMap.end()) {
+    return;
+  }
+
+  topicMap[name.c_str()](String(message));
+}
 
 void mqtt::loop() {
   connect();
@@ -40,14 +59,26 @@ void mqtt::connect() {
   }
   String clientId = String("ESP8266Client-") + ESP.getChipId();
 
-  Serial.println("Attempting MQTT connection...");
+  Serial.println("[mqtt] Attempting MQTT connection...");
 
   if (pubsub.connect(clientId.c_str())) {
-    String subscribeTopic = topic;
+    String subscribeTopic = baseTopic;
     subscribeTopic += "/+/set";
-    Serial.printf("connected, subscribing %s\n", subscribeTopic.c_str());
+    Serial.printf("[mqtt] connected, subscribing %s\n", subscribeTopic.c_str());
     pubsub.subscribe(subscribeTopic.c_str());
   } else {
-    Serial.printf("failed, rc=%d try again in 5 seconds\n", pubsub.state());
+    Serial.printf("[mqtt] failed, rc=%d try again in 5 seconds\n",
+                  pubsub.state());
   }
+}
+
+void mqtt::listen(String name, std::function<void(String)> callback) {
+  String* toRegister = new String(String("/") + name + "/set");
+  Serial.printf("[mqtt] registering topic \"%s\"\n", toRegister->c_str());
+  topicMap[toRegister->c_str()] = callback;
+}
+
+bool mqtt::publish(String name, String value) {
+  auto pubTopic = baseTopic + "/" + name;
+  return pubsub.publish(pubTopic.c_str(), value.c_str());
 }

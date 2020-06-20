@@ -13,7 +13,7 @@ base::base()
   digitalWrite(LED_BUILTIN, LOW);
   delay(1000);
   Serial.begin(9600);
-  Serial.println("Initializing...");
+  Serial.println("[base] Initializing...");
 
   wifiManager.setConfigPortalTimeout(180);
   wifiManager.setSaveConfigCallback(std::bind(&base::saveConfig, this));
@@ -25,14 +25,14 @@ bool base::connect() {
   loadConfig();
   String ssid = String("esp-") + ESP.getChipId();
   if (!wifiManager.autoConnect(ssid.c_str())) {
-    Serial.println("failed to connect and hit timeout");
+    Serial.println("[base] failed to connect and hit timeout");
     delay(1000);
     ESP.restart();
     return false;
   }
   saveConfig();
   digitalWrite(LED_BUILTIN, HIGH);
-  Serial.print("Connected with IP: ");
+  Serial.print("[base] Connected with IP: ");
   Serial.println(WiFi.localIP());
   return true;
 }
