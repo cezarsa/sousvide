@@ -55,6 +55,7 @@ void pidController::refreshPID() {
   pid = new PID(&pidInput, &pidOutput, &setpoint, kp, ki, kd, DIRECT);
   pid->SetOutputLimits(0, WINDOW_SIZE);
   pid->SetMode(AUTOMATIC);
+  windowStartTime = millis();
   refreshMQTT();
 }
 
@@ -76,14 +77,15 @@ void pidController::loop() {
   lastLoop = now;
 
   float temp = b->water.readTemperature();
+  pidInput = double(temp);
   if (!isSafe(temp)) {
     return;
   }
   if (!pid) {
+    refreshMQTT();
     return;
   }
 
-  pidInput = double(temp);
   pid->Compute();
 
   if (millis() - windowStartTime > WINDOW_SIZE) {
