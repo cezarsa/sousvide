@@ -1,5 +1,5 @@
-#ifndef _SOUSVIDE_MQTT_HPP_
-#define _SOUSVIDE_MQTT_HPP_
+#ifndef _SOUSVIDE_MQTT_H_
+#define _SOUSVIDE_MQTT_H_
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>

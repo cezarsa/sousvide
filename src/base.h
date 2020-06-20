@@ -1,5 +1,5 @@
-#ifndef _SOUSVIDE_BASE_HPP_
-#define _SOUSVIDE_BASE_HPP_
+#ifndef _SOUSVIDE_BASE_H_
+#define _SOUSVIDE_BASE_H_
 
 #include <PubSubClient.h>
 #include <WiFiManager.h>

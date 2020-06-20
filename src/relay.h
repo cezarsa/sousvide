@@ -1,5 +1,5 @@
-#ifndef _SOUSVIDE_RELAY_HPP_
-#define _SOUSVIDE_RELAY_HPP_
+#ifndef _SOUSVIDE_RELAY_H_
+#define _SOUSVIDE_RELAY_H_
 
 #include "mqtt.h"
 

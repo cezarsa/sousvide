@@ -1,21 +1,8 @@
+#include "main.h"
+
 #include <Arduino.h>
 
 #include "base.h"
-#include "mqtt.h"
-#include "relay.h"
-#include "temperature.h"
-
-class board {
- private:
-  mqtt* mqttConn;
-  relay pump, heater;
-  temp water;
-
- public:
-  board();
-  void setup();
-  void loop();
-};
 
 board::board() : pump("pump", D5), heater("heater", D6), water("water", D7) {}
 

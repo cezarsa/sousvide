@@ -1,5 +1,5 @@
-#ifndef _SOUSVIDE_TEMPERATURE_HPP_
-#define _SOUSVIDE_TEMPERATURE_HPP_
+#ifndef _SOUSVIDE_TEMPERATURE_H_
+#define _SOUSVIDE_TEMPERATURE_H_
 
 #include <DallasTemperature.h>
 #include <OneWire.h>
