@@ -15,7 +15,7 @@ base::base()
   Serial.begin(9600);
   Serial.println("[base] Initializing...");
 
-  wifiManager.setConfigPortalTimeout(180);
+  wifiManager.setConfigPortalTimeout(300);
   wifiManager.setSaveConfigCallback(std::bind(&base::saveConfig, this));
   wifiManager.addParameter(&mqttServer);
   wifiManager.addParameter(&mqttTopic);

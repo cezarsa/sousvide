@@ -16,7 +16,7 @@ class pidController : public controller {
   unsigned long lastErrorNotify = 0;
   unsigned long windowStartTime = 0;
   bool active = false;
-  double kp = 2, ki = 5, kd = 1;
+  double kp = 8000, ki = 133, kd = 420000;
   double pidInput = 0, pidOutput = 0, setpoint = 0;
 
   void notifyError(String error);

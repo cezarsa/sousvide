@@ -6,6 +6,8 @@
 
 #include "mqtt.h"
 
+const unsigned long MIN_TEMPERATURE_READ_INTERVAL = 1500;
+
 class temp {
  private:
   String name;
@@ -14,6 +16,10 @@ class temp {
   bool initialized = false;
   unsigned long lastLoop = 0;
   mqtt* conn = nullptr;
+  float lastTemp = DEVICE_DISCONNECTED_C;
+  unsigned long lastRead = 0;
+
+  float readTemperatureRaw();
 
  public:
   temp(String name, int pin);

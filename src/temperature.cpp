@@ -6,16 +6,31 @@ temp::temp(String name, int pin)
 temp::~temp() {}
 
 float temp::readTemperature() {
+  unsigned long now = millis();
+  if (lastRead != 0 && (now - lastRead < MIN_TEMPERATURE_READ_INTERVAL)) {
+    return lastTemp;
+  }
+  lastRead = now;
+
+  float tempC;
+  for (int i = 0; i < 2; i++) {
+    tempC = readTemperatureRaw();
+    initialized = tempC != DEVICE_DISCONNECTED_C;
+    if (initialized) {
+      break;
+    }
+  }
+
+  return tempC;
+}
+
+float temp::readTemperatureRaw() {
   if (!initialized) {
     sensors.begin();
   }
 
   sensors.requestTemperatures();
-  float tempC = sensors.getTempCByIndex(0);
-  if (tempC != DEVICE_DISCONNECTED_C) {
-    initialized = true;
-  }
-  return tempC;
+  return sensors.getTempCByIndex(0);
 }
 
 void temp::bindMQTT(mqtt* conn) {
