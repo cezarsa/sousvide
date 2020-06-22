@@ -1,5 +1,4 @@
-#ifndef _SOUSVIDE_CONTROL_PID_H_
-#define _SOUSVIDE_CONTROL_PID_H_
+#pragma once
 
 #include <Arduino.h>
 #include <PID_v1.h>
@@ -30,5 +29,3 @@ class pidController : public controller {
   void setup(board* b) override;
   void loop() override;
 };
-
-#endif

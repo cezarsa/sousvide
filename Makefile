@@ -3,3 +3,6 @@ build:
 
 upload:
 	pio run -t upload
+
+clean:
+	pio run -t clean

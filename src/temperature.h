@@ -1,5 +1,4 @@
-#ifndef _SOUSVIDE_TEMPERATURE_H_
-#define _SOUSVIDE_TEMPERATURE_H_
+#pragma once
 
 #include <DallasTemperature.h>
 #include <OneWire.h>
@@ -29,5 +28,3 @@ class temp {
   void loop();
   float readTemperature();
 };
-
-#endif

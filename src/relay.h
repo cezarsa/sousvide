@@ -1,5 +1,4 @@
-#ifndef _SOUSVIDE_RELAY_H_
-#define _SOUSVIDE_RELAY_H_
+#pragma once
 
 #include "mqtt.h"
 
@@ -24,5 +23,3 @@ class relay {
   void bindMQTT(mqtt* conn, bool pubOnly);
   void loop();
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef _SOUSVIDE_MAIN_H_
-#define _SOUSVIDE_MAIN_H_
+#pragma once
 
 #include "control_base.h"
 #include "mqtt.h"
@@ -17,5 +16,3 @@ class board {
   void setup();
   void loop();
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef _SOUSVIDE_BASE_H_
-#define _SOUSVIDE_BASE_H_
+#pragma once
 
 #include <PubSubClient.h>
 #include <WiFiManager.h>
@@ -23,5 +22,3 @@ class base {
   String topic();
   String server();
 };
-
-#endif

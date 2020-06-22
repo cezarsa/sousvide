@@ -1,5 +1,4 @@
-#ifndef _SOUSVIDE_MQTT_H_
-#define _SOUSVIDE_MQTT_H_
+#pragma once
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
@@ -34,5 +33,3 @@ class mqtt {
   void listen(String name, std::function<void(String)> callback);
   bool publish(String name, String value);
 };
-
-#endif
