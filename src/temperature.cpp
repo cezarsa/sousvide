@@ -12,16 +12,15 @@ float temp::readTemperature() {
   }
   lastRead = now;
 
-  float tempC;
   for (int i = 0; i < 2; i++) {
-    tempC = readTemperatureRaw();
-    initialized = tempC != DEVICE_DISCONNECTED_C;
+    lastTemp = readTemperatureRaw();
+    initialized = lastTemp != DEVICE_DISCONNECTED_C;
     if (initialized) {
       break;
     }
   }
 
-  return tempC;
+  return lastTemp;
 }
 
 float temp::readTemperatureRaw() {
