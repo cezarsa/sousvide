@@ -8,7 +8,7 @@ base::base()
                 "mqtt topic",
                 "home/kitchen/sousvide",
                 MAX_PARAM_LENGTH - 1),
-      mqttServer("server", "mqtt server", "pi.casa", MAX_PARAM_LENGTH - 1) {
+      mqttServer("server", "mqtt server", "192.168.1.2", MAX_PARAM_LENGTH - 1) {
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
   delay(1000);
@@ -23,7 +23,7 @@ base::base()
 
 bool base::connect() {
   loadConfig();
-  String ssid = String("esp-") + ESP.getChipId();
+  String ssid = String("sousvide-") + ESP.getChipId();
   if (!wifiManager.autoConnect(ssid.c_str())) {
     Serial.println("[base] failed to connect and hit timeout");
     delay(1000);
@@ -83,4 +83,6 @@ String base::server() {
   return mqttServer.getValue();
 }
 
-base::~base() {}
+base::~base() {
+  LittleFS.end();
+}

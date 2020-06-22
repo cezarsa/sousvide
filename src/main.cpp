@@ -16,11 +16,12 @@ void board::setup() {
   pump.bindMQTT(mqttConn, false);
   heater.bindMQTT(mqttConn, false);
   water.bindMQTT(mqttConn);
-  control = new pidController();
-  control->setup(this);
+  control = new pidController(this);
+  updates.setup(control);
 }
 
 void board::loop() {
+  updates.loop();
   if (mqttConn) {
     mqttConn->loop();
   }

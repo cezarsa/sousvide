@@ -24,8 +24,8 @@ class pidController : public controller {
   void refreshMQTT();
 
  public:
-  pidController();
-  ~pidController();
-  void setup(board* b) override;
+  pidController(board* b);
+  ~pidController() override;
   void loop() override;
+  void shutdown() override;
 };

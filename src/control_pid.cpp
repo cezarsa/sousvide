@@ -2,13 +2,9 @@
 
 #include "main.h"
 
-pidController::pidController() {}
-
 pidController::~pidController() {}
 
-void pidController::setup(board* b) {
-  this->b = b;
-
+pidController::pidController(board* b) : b(b) {
   b->mqttConn->listen("control/kp", [this](String value) {
     kp = atof(value.c_str());
     refreshPID();
@@ -130,4 +126,10 @@ void pidController::notifyError(String error) {
   }
   lastErrorNotify = now;
   b->mqttConn->publish("control/error", error);
+}
+
+void pidController::shutdown() {
+  setpoint = 0.0;
+  active = false;
+  refreshPID();
 }
