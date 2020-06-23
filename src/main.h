@@ -4,6 +4,7 @@
 #include "mqtt.h"
 #include "ota.h"
 #include "relay.h"
+#include "screen.h"
 #include "temperature.h"
 
 class board {
@@ -13,6 +14,7 @@ class board {
   temp water;
   controller* control = nullptr;
   ota updates;
+  screen display;
 
   board();
   void setup();

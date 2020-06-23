@@ -1,5 +1,6 @@
 #include "control_pid.h"
 
+#include "common.h"
 #include "main.h"
 
 pidController::~pidController() {}
@@ -118,7 +119,7 @@ bool pidController::isSafe(float temp) {
 }
 
 void pidController::notifyError(String error) {
-  Serial.printf("[pid controller] %s\n", error.c_str());
+  logger.printf("[pid controller] %s\n", error.c_str());
 
   unsigned long now = millis();
   if (now - lastErrorNotify < 30000) {

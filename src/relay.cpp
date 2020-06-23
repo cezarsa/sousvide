@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 
+#include "common.h"
+
 relay::relay(String name, int pin) : name(name), pin(pin) {
   pinMode(pin, OUTPUT);
   refresh();
@@ -25,7 +27,6 @@ void relay::toggle() {
 }
 
 void relay::refresh() {
-  Serial.printf("[relay] updating %s - state %d\n", name.c_str(), state);
   digitalWrite(pin, state ? LOW : HIGH);
   if (conn) {
     conn->publish(name + "/state", String(state));

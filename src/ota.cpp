@@ -2,6 +2,8 @@
 
 #include <ArduinoOTA.h>
 
+#include "common.h"
+
 ota::ota() {}
 
 ota::~ota() {}
@@ -18,25 +20,25 @@ void ota::setup(controller* control) {
       type = "filesystem";
     }
 
-    Serial.println("[ota] Start updating " + type);
+    logger.println("[ota] Start updating " + type);
     control->shutdown();
   });
-  ArduinoOTA.onEnd([]() { Serial.println("\n[ota] Success"); });
+  ArduinoOTA.onEnd([]() { logger.println("\n[ota] Success"); });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    Serial.printf("[ota] Progress: %u%%\r", (progress / (total / 100)));
+    logger.printf("[ota] Progress: %u%%\r", (progress / (total / 100)));
   });
   ArduinoOTA.onError([](ota_error_t error) {
-    Serial.printf("[ota] Error[%u]: ", error);
+    logger.printf("[ota] Error[%u]: ", error);
     if (error == OTA_AUTH_ERROR) {
-      Serial.println("Auth Failed");
+      logger.println("Auth Failed");
     } else if (error == OTA_BEGIN_ERROR) {
-      Serial.println("Begin Failed");
+      logger.println("Begin Failed");
     } else if (error == OTA_CONNECT_ERROR) {
-      Serial.println("Connect Failed");
+      logger.println("Connect Failed");
     } else if (error == OTA_RECEIVE_ERROR) {
-      Serial.println("Receive Failed");
+      logger.println("Receive Failed");
     } else if (error == OTA_END_ERROR) {
-      Serial.println("End Failed");
+      logger.println("End Failed");
     }
   });
   ArduinoOTA.begin(true);

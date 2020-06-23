@@ -18,6 +18,7 @@ void board::setup() {
   water.bindMQTT(mqttConn);
   control = new pidController(this);
   updates.setup(control);
+  display.bind(this);
 }
 
 void board::loop() {
@@ -31,6 +32,7 @@ void board::loop() {
   if (control) {
     control->loop();
   }
+  display.loop();
 }
 
 board b;

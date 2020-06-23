@@ -1,7 +1,8 @@
 #include "base.h"
 
-#include <FS.h>
 #include <LittleFS.h>
+
+#include "common.h"
 
 base::base()
     : mqttTopic("topic",
@@ -13,7 +14,7 @@ base::base()
   digitalWrite(LED_BUILTIN, LOW);
   delay(1000);
   Serial.begin(9600);
-  Serial.println("[base] Initializing...");
+  logger.println("[base] Initializing...");
 
   wifiManager.setConfigPortalTimeout(300);
   wifiManager.setSaveConfigCallback(std::bind(&base::saveConfig, this));
@@ -25,15 +26,15 @@ bool base::connect() {
   loadConfig();
   String ssid = String("sousvide-") + ESP.getChipId();
   if (!wifiManager.autoConnect(ssid.c_str())) {
-    Serial.println("[base] failed to connect and hit timeout");
+    logger.println("[base] failed to connect and hit timeout");
     delay(1000);
     ESP.restart();
     return false;
   }
   saveConfig();
   digitalWrite(LED_BUILTIN, HIGH);
-  Serial.print("[base] Connected with IP: ");
-  Serial.println(WiFi.localIP());
+  logger.print("[base] Connected with IP: ");
+  logger.println(WiFi.localIP());
   return true;
 }
 

@@ -1,7 +1,9 @@
 #include "mqtt.h"
 
+#include "common.h"
+
 mqtt::mqtt(String server, String topic) : pubsub(wifi), baseTopic(topic) {
-  Serial.printf("[mqtt] Initialize, server: %s, topic: %s\n", server.c_str(),
+  logger.printf("[mqtt] Initialize, server: %s, topic: %s\n", server.c_str(),
                 topic.c_str());
 
   IPAddress serverIP;
@@ -30,14 +32,14 @@ void mqtt::onMessage(char* topic, uint8_t* payload, unsigned int length) {
   memcpy(message, payload, length);
   message[length] = 0;
 
-  Serial.printf("[mqtt] message received in \"%s\": \"%s\"\n", topic, message);
+  logger.printf("[mqtt] message received in \"%s\": \"%s\"\n", topic, message);
 
   if (topicStr.indexOf(baseTopic) != 0) {
     return;
   }
 
   auto name = topicStr.substring(baseTopic.length());
-  Serial.printf("[mqtt] parsed name \"%s\"\n", name.c_str());
+  logger.printf("[mqtt] parsed name \"%s\"\n", name.c_str());
 
   if (topicMap.find(name.c_str()) == topicMap.end()) {
     return;
@@ -62,22 +64,22 @@ void mqtt::connect() {
   }
   String clientId = String("ESP8266Client-") + ESP.getChipId();
 
-  Serial.println("[mqtt] Attempting MQTT connection...");
+  logger.println("[mqtt] Attempting MQTT connection...");
 
   if (pubsub.connect(clientId.c_str())) {
     String subscribeTopic = baseTopic;
     subscribeTopic += "/#";
-    Serial.printf("[mqtt] connected, subscribing %s\n", subscribeTopic.c_str());
+    logger.printf("[mqtt] connected, subscribing %s\n", subscribeTopic.c_str());
     pubsub.subscribe(subscribeTopic.c_str());
   } else {
-    Serial.printf("[mqtt] failed, rc=%d try again in 5 seconds\n",
+    logger.printf("[mqtt] failed, rc=%d try again in 5 seconds\n",
                   pubsub.state());
   }
 }
 
 void mqtt::listen(String name, std::function<void(String)> callback) {
   String* toRegister = new String(String("/") + name + "/set");
-  Serial.printf("[mqtt] registering topic \"%s\"\n", toRegister->c_str());
+  logger.printf("[mqtt] registering topic \"%s\"\n", toRegister->c_str());
   topicMap[toRegister->c_str()] = callback;
 }
 
