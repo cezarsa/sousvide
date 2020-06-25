@@ -21,11 +21,6 @@ void relay::off() {
   refresh();
 }
 
-void relay::toggle() {
-  state = !state;
-  refresh();
-}
-
 void relay::refresh() {
   digitalWrite(pin, state ? LOW : HIGH);
   if (conn) {

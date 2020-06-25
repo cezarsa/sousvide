@@ -7,7 +7,7 @@ const size_t maxLineSize = 1024;
 class loggerPrint : public Print {
   WiFiUDP udpClient;
   Syslog syslog;
-  char lineBuffer[maxLineSize];
+  char lineBuffer[maxLineSize] = {0};
   size_t pos = 0;
 
  public:

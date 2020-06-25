@@ -4,7 +4,7 @@
 
 class ota {
  private:
-  controller* control;
+  controller* control = nullptr;
 
  public:
   ota();

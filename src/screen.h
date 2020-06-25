@@ -11,7 +11,7 @@ class screen {
                    graphPoints = screen::graphWidth / screen::graphSpacing;
 
   Adafruit_SSD1306 display;
-  board* b;
+  board* b = nullptr;
   bool initialized = false;
   unsigned long lastRefresh = 0;
   float datapoints[screen::graphPoints] = {0};
