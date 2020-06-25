@@ -3,7 +3,7 @@
 #include "common.h"
 #include "main.h"
 
-const unsigned long refreshInterval = 1000;
+const unsigned long refreshInterval = 500;
 const unsigned long graphRefreshInterval = 2000;
 
 #define SCREEN_WIDTH 128  // display width, in pixels
@@ -51,13 +51,17 @@ bool screen::initialize() {
 }
 
 void screen::graph(unsigned long now) {
-  if (lastGraphRefresh == 0 || now - lastGraphRefresh >= graphRefreshInterval) {
-    lastGraphRefresh = now;
-
-    auto temp = this->b->water.readTemperature();
-    datapoints[lastIndex] = temp;
-    lastIndex = (lastIndex + 1) % screen::graphPoints;
+  if (lastGraphRefresh != 0 && now - lastGraphRefresh < graphRefreshInterval) {
+    return;
   }
+  lastGraphRefresh = now;
+
+  display.fillRect(0, screen::graphYStart, screen::graphWidth,
+                   screen::graphHeight, BLACK);
+
+  auto temp = this->b->water.readTemperature();
+  datapoints[lastIndex] = temp;
+  lastIndex = (lastIndex + 1) % screen::graphPoints;
 
   float max = -9999.0, min = 9999.0;
   for (auto i = 0; i < screen::graphPoints; i++) {
@@ -116,7 +120,7 @@ void screen::loop() {
     return;
   }
 
-  display.clearDisplay();
+  display.fillRect(0, 0, SCREEN_WIDTH, screen::graphYStart, BLACK);
   display.setCursor(0, 0);
   display.setTextSize(1);
   display.printf("Set :%5.2f\xf7  On  :%c\nTemp:%5.2f\xf7  Heat:%c",
