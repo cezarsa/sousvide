@@ -28,4 +28,9 @@ class pidController : public controller {
   ~pidController() override;
   void loop() override;
   void shutdown() override;
+
+  bool getActive() { return active; }
+  double getInput() { return pidInput; }
+  double getOutput() { return pidOutput; }
+  double getSetpoint() { return setpoint; }
 };

@@ -18,8 +18,9 @@ class relay {
 
   void on();
   void off();
-  void toggle();
 
   void bindMQTT(mqtt* conn, bool pubOnly);
   void loop();
+
+  bool getState() { return state; }
 };

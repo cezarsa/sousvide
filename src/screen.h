@@ -14,8 +14,12 @@ class screen {
   board* b = nullptr;
   bool initialized = false;
   unsigned long lastRefresh = 0;
+  unsigned long lastGraphRefresh = 0;
   float datapoints[screen::graphPoints] = {0};
   unsigned int lastIndex = 0;
+
+  void graph(unsigned long now);
+  bool initialize();
 
  public:
   screen();
@@ -23,6 +27,4 @@ class screen {
 
   void bind(board* b);
   void loop();
-  void graph();
-  bool initialize();
 };

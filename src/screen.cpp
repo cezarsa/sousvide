@@ -3,7 +3,8 @@
 #include "common.h"
 #include "main.h"
 
-const unsigned long refreshInterval = 1600;
+const unsigned long refreshInterval = 1000;
+const unsigned long graphRefreshInterval = 2000;
 
 #define SCREEN_WIDTH 128  // display width, in pixels
 #define SCREEN_HEIGHT 64  // display height, in pixels
@@ -44,16 +45,19 @@ bool screen::initialize() {
   logger.println(F("[screen] SSD1306 initialized"));
 
   initialized = true;
-  display.setTextSize(2);
   display.setTextColor(WHITE);
 
   return true;
 }
 
-void screen::graph() {
-  auto temp = this->b->water.readTemperature();
-  datapoints[lastIndex] = temp;
-  lastIndex = (lastIndex + 1) % screen::graphPoints;
+void screen::graph(unsigned long now) {
+  if (lastGraphRefresh == 0 || now - lastGraphRefresh >= graphRefreshInterval) {
+    lastGraphRefresh = now;
+
+    auto temp = this->b->water.readTemperature();
+    datapoints[lastIndex] = temp;
+    lastIndex = (lastIndex + 1) % screen::graphPoints;
+  }
 
   float max = -9999.0, min = 9999.0;
   for (auto i = 0; i < screen::graphPoints; i++) {
@@ -114,8 +118,13 @@ void screen::loop() {
 
   display.clearDisplay();
   display.setCursor(0, 0);
-  display.setTextSize(2);
-  display.printf("Temp %.2f\n", this->b->water.readTemperature());
-  graph();
+  display.setTextSize(1);
+  display.printf("Set :%5.2f\xf7  On  :%c\nTemp:%5.2f\xf7  Heat:%c",
+                 this->b->control->getSetpoint(),
+                 this->b->control->getActive() ? '1' : '0',
+                 this->b->water.readTemperature(),
+                 this->b->heater.getState() ? '1' : '0');
+
+  graph(now);
   display.display();
 }
