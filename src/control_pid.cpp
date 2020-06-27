@@ -82,6 +82,7 @@ void pidController::loop() {
     refreshMQTT();
     return;
   }
+  b->pump.on();
 
   pid->Compute();
 
@@ -122,7 +123,7 @@ void pidController::notifyError(String error) {
   logger.printf("[pid controller] %s\n", error.c_str());
 
   unsigned long now = millis();
-  if (now - lastErrorNotify < 30000) {
+  if (lastErrorNotify != 0 && now - lastErrorNotify < 30000) {
     return;
   }
   lastErrorNotify = now;
