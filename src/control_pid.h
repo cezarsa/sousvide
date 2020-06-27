@@ -5,7 +5,7 @@
 
 #include "control_base.h"
 
-const int WINDOW_SIZE = 10000;
+const int WINDOW_SIZE = 10000, PID_EVALUATE_INTERVAL = 1000;
 
 class pidController : public controller {
  private:

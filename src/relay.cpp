@@ -28,15 +28,6 @@ void relay::refresh() {
   }
 }
 
-void relay::loop() {
-  unsigned long now = millis();
-  if (now - lastRefreshCheck < 5000) {
-    return;
-  }
-  lastRefreshCheck = now;
-  refresh();
-}
-
 void relay::bindMQTT(mqtt* conn, bool pubOnly) {
   this->conn = conn;
   if (pubOnly) {

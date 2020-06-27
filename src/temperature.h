@@ -5,14 +5,13 @@
 
 #include "mqtt.h"
 
-const unsigned long MIN_TEMPERATURE_READ_INTERVAL = 1500;
+const unsigned long MIN_TEMPERATURE_READ_INTERVAL = 1000;
 
 class temp {
  private:
   String name;
   OneWire oneWire;
   DallasTemperature sensors;
-  bool initialized = false;
   unsigned long lastLoop = 0;
   mqtt* conn = nullptr;
   float lastTemp = DEVICE_DISCONNECTED_C;

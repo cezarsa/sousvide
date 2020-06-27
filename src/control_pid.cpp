@@ -33,6 +33,7 @@ void pidController::refreshPID() {
     b->heater.off();
     b->pump.off();
     pidOutput = 0;
+    lastLoop = 0;
     if (pid) {
       delete pid;
       pid = nullptr;
@@ -40,8 +41,6 @@ void pidController::refreshPID() {
     refreshMQTT();
     return;
   }
-
-  b->pump.on();
 
   if (pid) {
     pid->SetTunings(kp, ki, kd);
@@ -52,6 +51,7 @@ void pidController::refreshPID() {
   pid = new PID(&pidInput, &pidOutput, &setpoint, kp, ki, kd, DIRECT);
   pid->SetOutputLimits(0, WINDOW_SIZE);
   pid->SetMode(AUTOMATIC);
+  pid->SetSampleTime(PID_EVALUATE_INTERVAL);
   windowStartTime = millis();
   refreshMQTT();
 }
@@ -68,7 +68,7 @@ void pidController::refreshMQTT() {
 
 void pidController::loop() {
   unsigned long now = millis();
-  if (now - lastLoop < 1000) {
+  if (lastLoop != 0 && now - lastLoop < PID_EVALUATE_INTERVAL) {
     return;
   }
   lastLoop = now;

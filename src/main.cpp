@@ -5,6 +5,8 @@
 #include "base.h"
 #include "control_pid.h"
 
+const bool displayEnabled = true;
+
 board::board() : pump("pump", D5), heater("heater", D6), water("water", D7) {}
 
 void board::setup() {
@@ -18,7 +20,9 @@ void board::setup() {
   water.bindMQTT(mqttConn);
   control = new pidController(this);
   updates.setup(control);
-  display.bind(this);
+  if (displayEnabled) {
+    display.bind(this);
+  }
 }
 
 void board::loop() {
@@ -26,13 +30,13 @@ void board::loop() {
   if (mqttConn) {
     mqttConn->loop();
   }
-  pump.loop();
-  heater.loop();
   water.loop();
   if (control) {
     control->loop();
   }
-  display.loop();
+  if (displayEnabled) {
+    display.loop();
+  }
 }
 
 board b;

@@ -44,5 +44,9 @@ class loggerPrint : public Print {
   }
 };
 
+#ifdef REMOTE_LOGGER
 loggerPrint syslogLogger;
 loggerPrint& logger(syslogLogger);
+#else
+HardwareSerial& logger(Serial);
+#endif

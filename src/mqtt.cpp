@@ -28,11 +28,7 @@ void mqtt::onMessage(char* topic, uint8_t* payload, unsigned int length) {
     return;
   }
 
-  char message[length + 1];
-  memcpy(message, payload, length);
-  message[length] = 0;
-
-  logger.printf("[mqtt] message received in \"%s\": \"%s\"\n", topic, message);
+  logger.printf("[mqtt] message received in \"%s\"\n", topic);
 
   if (topicStr.indexOf(baseTopic) != 0) {
     return;
@@ -45,7 +41,11 @@ void mqtt::onMessage(char* topic, uint8_t* payload, unsigned int length) {
     return;
   }
 
+  char* message = new char[length + 1];
+  memcpy(message, payload, length);
+  message[length] = 0;
   topicMap[name.c_str()](String(message));
+  delete[] message;
 }
 
 void mqtt::loop() {
@@ -55,11 +55,12 @@ void mqtt::loop() {
 
 void mqtt::connect() {
   unsigned long now = millis();
-  if (now - lastMQTTCheck < 5000) {
+  if (lastMQTTCheck != 0 && now - lastMQTTCheck < 5000) {
     return;
   }
   lastMQTTCheck = now;
   if (pubsub.connected()) {
+    publish("core/heap", String(ESP.getFreeHeap()));
     return;
   }
   String clientId = String("ESP8266Client-") + ESP.getChipId();
@@ -67,8 +68,10 @@ void mqtt::connect() {
   logger.println("[mqtt] Attempting MQTT connection...");
 
   if (pubsub.connect(clientId.c_str())) {
-    String subscribeTopic = baseTopic;
-    subscribeTopic += "/#";
+    String subscribeTopic = baseTopic + "/+/set";
+    logger.printf("[mqtt] connected, subscribing %s\n", subscribeTopic.c_str());
+    pubsub.subscribe(subscribeTopic.c_str());
+    subscribeTopic = baseTopic + "/+/+/set";
     logger.printf("[mqtt] connected, subscribing %s\n", subscribeTopic.c_str());
     pubsub.subscribe(subscribeTopic.c_str());
   } else {
