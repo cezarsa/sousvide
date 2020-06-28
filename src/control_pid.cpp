@@ -25,7 +25,6 @@ void pidController::refreshPID() {
     lastCheck = 0;
     onTime = 0;
     offTime = 0;
-    return;
   }
   refreshMQTT();
 }
