@@ -79,7 +79,7 @@ void pidController::simpleHysteresis() {
   }
 
   if (pidInput < (setpoint - 0.4)) {
-    if (onTime >= 3000) {
+    if (onTime >= 4000) {
       b->heater.off();
     } else if (offTime >= 5000) {
       b->heater.on();
@@ -88,7 +88,7 @@ void pidController::simpleHysteresis() {
   }
 
   if (pidInput < setpoint) {
-    if (onTime >= 2000) {
+    if (onTime >= 3000) {
       b->heater.off();
     } else if (offTime >= 10000) {
       b->heater.on();
