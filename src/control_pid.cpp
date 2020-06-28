@@ -6,18 +6,6 @@
 pidController::~pidController() {}
 
 pidController::pidController(board* b) : b(b) {
-  b->mqttConn->listen("control/kp", [this](String value) {
-    kp = atof(value.c_str());
-    refreshPID();
-  });
-  b->mqttConn->listen("control/ki", [this](String value) {
-    ki = atof(value.c_str());
-    refreshPID();
-  });
-  b->mqttConn->listen("control/kd", [this](String value) {
-    kd = atof(value.c_str());
-    refreshPID();
-  });
   b->mqttConn->listen("control/setpoint", [this](String value) {
     setpoint = atof(value.c_str());
     refreshPID();
@@ -31,38 +19,20 @@ pidController::pidController(board* b) : b(b) {
 void pidController::refreshPID() {
   if (setpoint == 0.0 || !active) {
     b->heater.off();
+    delay(1000);
     b->pump.off();
-    pidOutput = 0;
     lastLoop = 0;
-    if (pid) {
-      delete pid;
-      pid = nullptr;
-    }
-    refreshMQTT();
+    lastCheck = 0;
+    onTime = 0;
+    offTime = 0;
     return;
   }
-
-  if (pid) {
-    pid->SetTunings(kp, ki, kd);
-    refreshMQTT();
-    return;
-  }
-
-  pid = new PID(&pidInput, &pidOutput, &setpoint, kp, ki, kd, DIRECT);
-  pid->SetOutputLimits(0, WINDOW_SIZE);
-  pid->SetMode(AUTOMATIC);
-  pid->SetSampleTime(PID_EVALUATE_INTERVAL);
-  windowStartTime = millis();
   refreshMQTT();
 }
 
 void pidController::refreshMQTT() {
-  b->mqttConn->publish("control/kp", String(kp));
-  b->mqttConn->publish("control/ki", String(ki));
-  b->mqttConn->publish("control/kd", String(kd));
   b->mqttConn->publish("control/setpoint", String(setpoint));
   b->mqttConn->publish("control/input", String(pidInput));
-  b->mqttConn->publish("control/output", String(pidOutput));
   b->mqttConn->publish("control/state", String(active));
 }
 
@@ -78,28 +48,62 @@ void pidController::loop() {
   if (!isSafe(temp)) {
     return;
   }
-  if (!pid) {
+  if (setpoint == 0.0 || !active) {
     refreshMQTT();
     return;
   }
-  b->pump.on();
-
-  pid->Compute();
-
-  if (millis() - windowStartTime > WINDOW_SIZE) {
-    windowStartTime += WINDOW_SIZE;
+  if (!b->pump.getState()) {
+    b->pump.on();
+    delay(1000);
   }
-  if (pidOutput < millis() - windowStartTime) {
-    b->heater.off();
-  } else {
-    b->heater.on();
-  }
+  simpleHysteresis();
   refreshMQTT();
+}
+
+void pidController::simpleHysteresis() {
+  unsigned long now = millis();
+
+  if (lastCheck != 0) {
+    if (b->heater.getState()) {
+      onTime += now - lastCheck;
+      offTime = 0;
+    } else {
+      offTime += now - lastCheck;
+      onTime = 0;
+    }
+  }
+  lastCheck = now;
+
+  if (pidInput < (setpoint - 2)) {
+    b->heater.on();
+    return;
+  }
+
+  if (pidInput < (setpoint - 0.4)) {
+    if (onTime >= 3000) {
+      b->heater.off();
+    } else if (offTime >= 5000) {
+      b->heater.on();
+    }
+    return;
+  }
+
+  if (pidInput < setpoint) {
+    if (onTime >= 2000) {
+      b->heater.off();
+    } else if (offTime >= 10000) {
+      b->heater.on();
+    }
+    return;
+  }
+
+  b->heater.off();
 }
 
 bool pidController::isSafe(float temp) {
   if (temp <= 0) {
     b->heater.off();
+    delay(1000);
     b->pump.off();
     notifyError(
         String(
@@ -110,6 +114,7 @@ bool pidController::isSafe(float temp) {
 
   if (temp > 90) {
     b->heater.off();
+    delay(1000);
     b->pump.off();
     notifyError(String("temperature too high, shutting down for safety: ") +
                 temp);
