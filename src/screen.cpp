@@ -85,7 +85,7 @@ void screen::graph(unsigned long now) {
   for (auto i = lastIndex; i < lastIndex + screen::graphPoints; i++) {
     auto idx = i % screen::graphPoints;
     auto datapoint = datapoints[idx];
-    if (datapoint == 0.0) {
+    if (datapoint == 0.0f) {
       continue;
     }
 
@@ -104,9 +104,9 @@ void screen::graph(unsigned long now) {
 
   display.setTextSize(1);
   display.setCursor(0, screen::graphYStart);
-  display.printf("%.2f\n", max);
+  display.printf("%.2f\n", (double)max);
   display.setCursor(0, screen::graphYStart + screen::graphHeight - 7);
-  display.printf("%.2f\n", min);
+  display.printf("%.2f\n", (double)min);
 }
 
 void screen::loop() {
@@ -126,7 +126,7 @@ void screen::loop() {
   display.printf("Set :%5.2f\xf7  On  :%c\nTemp:%5.2f\xf7  Heat:%c",
                  this->b->control->getSetpoint(),
                  this->b->control->getActive() ? '1' : '0',
-                 this->b->water.readTemperature(),
+                 (double)this->b->water.readTemperature(),
                  this->b->heater.getState() ? '1' : '0');
 
   graph(now);
