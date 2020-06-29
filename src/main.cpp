@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 #include "base.h"
-#include "control_pid.h"
+#include "controller.h"
 
 const bool displayEnabled = true;
 
@@ -18,7 +18,7 @@ void board::setup() {
   pump.bindMQTT(mqttConn, false);
   heater.bindMQTT(mqttConn, false);
   water.bindMQTT(mqttConn);
-  control = new pidController(this);
+  control = new controller(this);
   updates.setup(control);
   if (displayEnabled) {
     display.bind(this);

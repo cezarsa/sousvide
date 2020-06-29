@@ -1,11 +1,11 @@
-#include "control_pid.h"
+#include "controller.h"
 
 #include "common.h"
 #include "main.h"
 
-pidController::~pidController() {}
+controller::~controller() {}
 
-pidController::pidController(board* b) : b(b) {
+controller::controller(board* b) : b(b) {
   b->mqttConn->listen("control/setpoint", [this](String value) {
     setpoint = atof(value.c_str());
     refreshPID();
@@ -16,7 +16,7 @@ pidController::pidController(board* b) : b(b) {
   });
 }
 
-void pidController::refreshPID() {
+void controller::refreshPID() {
   if (setpoint == 0.0 || !active) {
     b->heater.off();
     delay(1000);
@@ -29,13 +29,13 @@ void pidController::refreshPID() {
   refreshMQTT();
 }
 
-void pidController::refreshMQTT() {
+void controller::refreshMQTT() {
   b->mqttConn->publish("control/setpoint", String(setpoint));
   b->mqttConn->publish("control/input", String(pidInput));
   b->mqttConn->publish("control/state", String(active));
 }
 
-void pidController::loop() {
+void controller::loop() {
   unsigned long now = millis();
   if (lastLoop != 0 && now - lastLoop < PID_EVALUATE_INTERVAL) {
     return;
@@ -59,7 +59,7 @@ void pidController::loop() {
   refreshMQTT();
 }
 
-void pidController::simpleHysteresis() {
+void controller::simpleHysteresis() {
   unsigned long now = millis();
 
   if (lastCheck != 0) {
@@ -99,7 +99,7 @@ void pidController::simpleHysteresis() {
   b->heater.off();
 }
 
-bool pidController::isSafe(float temp) {
+bool controller::isSafe(float temp) {
   if (temp <= 0) {
     b->heater.off();
     delay(1000);
@@ -123,8 +123,8 @@ bool pidController::isSafe(float temp) {
   return true;
 }
 
-void pidController::notifyError(String error) {
-  logger.printf("[pid controller] %s\n", error.c_str());
+void controller::notifyError(String error) {
+  logger.printf("[controller] %s\n", error.c_str());
 
   unsigned long now = millis();
   if (lastErrorNotify != 0 && now - lastErrorNotify < 30000) {
@@ -134,7 +134,7 @@ void pidController::notifyError(String error) {
   b->mqttConn->publish("control/error", error);
 }
 
-void pidController::shutdown() {
+void controller::shutdown() {
   setpoint = 0.0;
   active = false;
   refreshPID();

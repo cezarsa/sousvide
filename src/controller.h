@@ -2,11 +2,11 @@
 
 #include <Arduino.h>
 
-#include "control_base.h"
+class board;
 
 const int PID_EVALUATE_INTERVAL = 1000;
 
-class pidController : public controller {
+class controller {
  private:
   board* b = nullptr;
   unsigned long lastLoop = 0, lastCheck = 0;
@@ -22,10 +22,10 @@ class pidController : public controller {
   void refreshMQTT();
 
  public:
-  explicit pidController(board* b);
-  ~pidController() override;
-  void loop() override;
-  void shutdown() override;
+  explicit controller(board* b);
+  ~controller();
+  void loop();
+  void shutdown();
 
   bool getActive() { return active; }
   double getInput() { return pidInput; }

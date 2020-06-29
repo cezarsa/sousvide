@@ -1,6 +1,6 @@
 #pragma once
 
-#include "control_pid.h"
+#include "controller.h"
 #include "mqtt.h"
 #include "ota.h"
 #include "relay.h"
@@ -12,7 +12,7 @@ class board {
   mqtt* mqttConn = nullptr;
   relay pump, heater;
   temp water;
-  pidController* control = nullptr;
+  controller* control = nullptr;
   ota updates;
   screen display;
 
