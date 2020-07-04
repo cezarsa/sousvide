@@ -3,7 +3,7 @@
 #include "common.h"
 #include "main.h"
 
-const unsigned long refreshInterval = 2000;
+const unsigned long refreshInterval = 500;
 const unsigned long graphRefreshInterval = 2000;
 
 #define SCREEN_WIDTH 128  // display width, in pixels
