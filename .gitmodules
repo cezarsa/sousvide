@@ -1,0 +1,3 @@
+[submodule "nonstandard/arduino"]
+	path = nonstandard/arduino
+	url = https://github.com/buxtronix/arduino.git
