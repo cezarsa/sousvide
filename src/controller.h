@@ -12,7 +12,7 @@ class controller {
   unsigned long lastLoop = 0, lastCheck = 0;
   unsigned long lastErrorNotify = 0;
   bool active = false;
-  double pidInput = 0, setpoint = 0;
+  float pidInput = 0, setpoint = 0;
   unsigned long onTime = 0, offTime = 0;
 
   void notifyError(String error);

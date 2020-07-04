@@ -8,13 +8,25 @@ temp::~temp() {}
 float temp::readTemperature() {
   unsigned long now = millis();
   lastRead = now;
-  lastTemp = readTemperatureRaw();
-  return lastTemp;
+  return readTemperatureRaw();
 }
 
 float temp::readTemperatureRaw() {
-  sensors.requestTemperatures();
-  return sensors.getTempCByIndex(0);
+  if (lastTemp == DEVICE_DISCONNECTED_C) {
+    sensors.setWaitForConversion(true);
+    sensors.requestTemperatures();
+    sensors.setWaitForConversion(false);
+  }
+
+  unsigned long now = millis();
+  if (now >= conversionDeadline) {
+    lastTemp = sensors.getTempCByIndex(0);
+    sensors.requestTemperatures();
+    conversionDeadline =
+        millis() + sensors.millisToWaitForConversion(sensors.getResolution());
+  }
+
+  return lastTemp;
 }
 
 void temp::bindMQTT(mqtt* conn) {

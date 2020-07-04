@@ -16,6 +16,7 @@ class temp {
   mqtt* conn = nullptr;
   float lastTemp = DEVICE_DISCONNECTED_C;
   unsigned long lastRead = 0;
+  unsigned long conversionDeadline = 0;
 
   float readTemperatureRaw();
 

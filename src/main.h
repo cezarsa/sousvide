@@ -6,6 +6,7 @@
 #include "relay.h"
 #include "screen.h"
 #include "temperature.h"
+#include "input.h"
 
 class board {
  public:
@@ -15,6 +16,7 @@ class board {
   controller* control = nullptr;
   ota updates;
   screen display;
+  input rotary;
 
   board();
   void setup();

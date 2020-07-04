@@ -17,7 +17,7 @@ controller::controller(board* b) : b(b) {
 }
 
 void controller::refreshPID() {
-  if (setpoint == 0.0 || !active) {
+  if (setpoint == 0.0f || !active) {
     b->heater.off();
     delay(1000);
     b->pump.off();
@@ -42,15 +42,16 @@ void controller::loop() {
   }
   lastLoop = now;
 
-  float temp = b->water.readTemperature();
-  pidInput = double(temp);
-  if (!isSafe(temp)) {
+  pidInput = b->water.readTemperature();
+  if (!isSafe(pidInput)) {
     return;
   }
-  if (setpoint == 0.0 || !active) {
+
+  if (setpoint == 0.0f || !active) {
     refreshMQTT();
     return;
   }
+
   if (!b->pump.getState()) {
     b->pump.on();
     delay(1000);
@@ -78,7 +79,7 @@ void controller::simpleHysteresis() {
     return;
   }
 
-  if (pidInput < (setpoint - 0.4)) {
+  if (pidInput < (setpoint - 0.4f)) {
     if (onTime >= 4000) {
       b->heater.off();
     } else if (offTime >= 5000) {
