@@ -28,6 +28,6 @@ class controller {
   void shutdown();
 
   bool getActive() { return active; }
-  double getInput() { return pidInput; }
-  double getSetpoint() { return setpoint; }
+  float getInput() { return pidInput; }
+  float getSetpoint() { return setpoint; }
 };

@@ -5,8 +5,9 @@
 class input {
  private:
   int clk, dt, sw;
-  int counter = 0;
-  int lastPosition = 0;
+  float step = 0.5f, minValue = 30.f, maxValue = 80.f;
+  float counter = minValue;
+  float lastPosition = 0.f;
   Rotary encoder;
 
   void encoderISR();
@@ -16,4 +17,6 @@ class input {
   ~input();
   void setup();
   void loop();
+
+  float getCounter() { return counter; }
 };

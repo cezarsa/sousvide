@@ -3,7 +3,7 @@
 #include "common.h"
 #include "main.h"
 
-const unsigned long refreshInterval = 500;
+const unsigned long refreshInterval = 500, blinkInterval = 400;
 const unsigned long graphRefreshInterval = 2000;
 
 #define SCREEN_WIDTH 128  // display width, in pixels
@@ -110,23 +110,62 @@ void screen::graph(unsigned long now) {
   display.printf("%.2f\n", (double)min);
 }
 
+bool screen::chooseSetpoint() {
+  auto setpoint = this->b->control->getSetpoint();
+  if (setpoint != 0.f) {
+    return false;
+  }
+  auto counter = this->b->rotary.getCounter();
+
+  unsigned long now = millis();
+
+  if (lastSetpoint == counter) {
+    if (now - lastBlink < blinkInterval) {
+      return true;
+    }
+    blinkState = !blinkState;
+  } else {
+    blinkState = false;
+  }
+
+  lastBlink = now;
+  lastSetpoint = counter;
+
+  display.clearDisplay();
+  display.setCursor(40, 0);
+  display.setTextSize(2);
+  display.print("TEMP");
+  display.setCursor(5, 24);
+  display.setTextSize(4);
+  if (!blinkState) {
+    display.printf("%05.2f", (double)counter);
+  }
+  display.display();
+
+  return true;
+}
+
 void screen::loop() {
+  if (!initialize()) {
+    return;
+  }
+
+  if (chooseSetpoint()) {
+    return;
+  }
+
   unsigned long now = millis();
   if (lastRefresh != 0 && now - lastRefresh < refreshInterval) {
     return;
   }
   lastRefresh = now;
 
-  if (!initialize()) {
-    return;
-  }
-
   auto temp = this->b->water.readTemperature();
   display.fillRect(0, 0, SCREEN_WIDTH, screen::graphYStart, BLACK);
   display.setCursor(0, 0);
   display.setTextSize(1);
   display.printf("Set :%5.2f\xf7  On  :%c\nTemp:%5.2f\xf7  Heat:%c",
-                 this->b->control->getSetpoint(),
+                 (double)this->b->control->getSetpoint(),
                  this->b->control->getActive() ? '1' : '0', (double)temp,
                  this->b->heater.getState() ? '1' : '0');
 

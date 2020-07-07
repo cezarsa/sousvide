@@ -12,10 +12,11 @@ input::~input() {}
 void input::encoderISR() {
   unsigned char result = encoder.process();
   if (result == DIR_CW) {
-    counter++;
+    counter += step;
   } else if (result == DIR_CCW) {
-    counter--;
+    counter -= step;
   }
+  counter = min(max(counter, minValue), maxValue);
 }
 
 void input::setup() {
@@ -27,7 +28,7 @@ void input::setup() {
 
 void input::loop() {
   if (lastPosition != counter) {
-    logger.println(counter);
+    // logger.println(counter);
     lastPosition = counter;
   }
 }
