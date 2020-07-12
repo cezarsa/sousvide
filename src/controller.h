@@ -5,6 +5,7 @@
 class board;
 
 const int PID_EVALUATE_INTERVAL = 1000;
+const int MEAN_INPUT_POINTS = 30;
 
 class controller {
  private:
@@ -13,6 +14,8 @@ class controller {
   unsigned long lastErrorNotify = 0;
   bool active = false;
   float pidInput = 0, setpoint = 0;
+  float meanInputPoints[MEAN_INPUT_POINTS]{0};
+  int meanInputIdx{0};
   unsigned long onTime = 0, offTime = 0;
 
   void notifyError(String error);

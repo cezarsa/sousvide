@@ -12,11 +12,17 @@ relay::relay(String name, int pin) : name(name), pin(pin) {
 relay::~relay() {}
 
 void relay::on() {
+  if (state) {
+    return;
+  }
   state = true;
   refresh();
 }
 
 void relay::off() {
+  if (!state) {
+    return;
+  }
   state = false;
   refresh();
 }

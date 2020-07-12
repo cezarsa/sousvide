@@ -47,6 +47,9 @@ void controller::loop() {
     return;
   }
 
+  meanInputPoints[meanInputIdx] = pidInput;
+  meanInputIdx = (meanInputIdx + 1) % MEAN_INPUT_POINTS;
+
   if (setpoint == 0.0f || !active) {
     refreshMQTT();
     return;
@@ -74,7 +77,18 @@ void controller::simpleHysteresis() {
   }
   lastCheck = now;
 
-  if (pidInput < (setpoint - 2)) {
+  int validPoints = 0;
+  float meanInput = 0.f;
+  for (auto v : meanInputPoints) {
+    if (v == 0) {
+      break;
+    }
+    validPoints++;
+    meanInput += v;
+  }
+  meanInput /= validPoints;
+
+  if (meanInput < (setpoint - 2)) {
     b->heater.on();
     return;
   }
@@ -88,7 +102,7 @@ void controller::simpleHysteresis() {
     return;
   }
 
-  if (pidInput < setpoint) {
+  if (meanInput < setpoint) {
     if (onTime >= 3000) {
       b->heater.off();
     } else if (offTime >= 10000) {
